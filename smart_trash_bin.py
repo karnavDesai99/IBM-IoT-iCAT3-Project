@@ -18,7 +18,7 @@ GPIO.setup(GPIO_ECHO, GPIO.IN)
 firebase = firebase.FirebaseApplication(<your firebase project URL>, None)
 
 def distance():
-    #set Trigger yo HIGH
+    #set Trigger to HIGH
     GPIO.output(GPIO_TRIGGER, True)
     
     #set Trigger after 0.01ms to LOW
