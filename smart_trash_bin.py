@@ -2,7 +2,9 @@
 import RPi.GPIO as GPIO
 import time
 from firebase import firebase
+from pushbullet import Pushbullet
 
+pb = Pushbullet("your access token provided by pushbullet")
 #GPIO Mode (BOARD/BCM)
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
@@ -15,10 +17,10 @@ GPIO.setup(GPIO_TRIGGER, GPIO.OUT)
 GPIO.setup(GPIO_ECHO, GPIO.IN)
 
 #Link Firebase
-firebase = firebase.FirebaseApplication(<your firebase project URL>, None)
+firebase = firebase.FirebaseApplication('your firebase project URL', None)
 
 def distance():
-    #set Trigger to HIGH
+    #set Trigger yo HIGH
     GPIO.output(GPIO_TRIGGER, True)
     
     #set Trigger after 0.01ms to LOW
@@ -39,7 +41,7 @@ def distance():
     #time difference between start and arrival
     TimeElapsed = StopTime - StartTime
     #multiply with the sonic speed (34300 cm/s)
-    #and divide by 2, because sound will take time to reach and then reflect back
+    #and divide by 2, because the wave will take time to reach and reflect back
     distance = (TimeElapsed*34300)/2
     
     return distance
@@ -53,11 +55,13 @@ if __name__ == '__main__':
         while True:
             dist = distance()
             print ("Measured Distance = %.1f cm" %dist)
-            if (dist <= 4.0):
+            if (dist <= 8.0):
                 upload(dist)
+                dev = pb.get_device('your device name provided by pushbullet')
+                push = dev.push_note("Bin Full", "Please empty the bin")
             time.sleep(5)
             
             #Reset by pressing CTRL + C
     except KeyboardInterrupt:
-        print("Measurement stopped by User")
+	print "Measurement stopped by User"
         GPIO.cleanup()
